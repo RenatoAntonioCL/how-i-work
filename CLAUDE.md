@@ -1,13 +1,22 @@
 # Project Context for Claude Code
 
 ## Project
-how-i-work — my engineering methodology: identity, principles, stack, conventions, and reusable templates.
+how-i-work — my public engineering methodology. This is **not a software project, it's a
+living document**: identity, principles, stack, conventions, and the templates I reuse.
+
+## How to help here
+The goal is always to keep this **honest, precise, and up to date with what I actually do —
+not aspirational**. When editing:
+- Describe reality, not intentions. If something isn't true yet, don't write it as if it is.
+- Prefer cutting vague or aspirational claims over adding more of them.
+- Keep it tight and concrete. This is read by people deciding how I work.
+- Keep the docs internally consistent (README ↔ conventions ↔ templates ↔ global context).
 
 ## Owner
 Renato Antonio — https://github.com/RenatoAntonioCL/how-i-work
 
 ## Stack
-Markdown only. No build, no runtime — this is a documentation repository.
+Markdown only. No build, no runtime, no tests — content quality is the only thing that matters.
 
 ## Structure
 - Root: `README.md`, `PROFILE.md`, `PRINCIPLES.md`, `STACK.md` — identity and standards.
@@ -19,24 +28,19 @@ Markdown only. No build, no runtime — this is a documentation repository.
 - `.github/pull_request_template.md` — active PR template for this repo.
 
 ## Non-negotiables
-- Branch protection on main — no direct pushes
-- CI must be green before merge (when a pipeline applies)
-- No secrets in code — use environment variables
-- Every significant decision gets an ADR
-- Semantic versioning
+- **Every change goes through a PR — no direct pushes to `main`, ever.**
+- Branch from `main`, open a PR, merge after review (self-review when working alone).
+- No secrets in code — use environment variables.
+- No placeholders left in real docs (templates carry them; shipped docs must not).
 
 ## Conventions
 - Commit format: type(scope): description (Conventional Commits)
 - Branch format: feat/description, fix/description, docs/description, chore/description
 - PR template: .github/pull_request_template.md
 - Commits NEVER include `Co-Authored-By` lines (no Claude/AI co-author) — ever
-- Writing in neutral Spanish for conversation; documents in English to match existing files
-
-## Current focus
-Keeping this methodology coherent and in sync with the global context (`templates/CLAUDE_GLOBAL.md`)
-and the active projects: GenPy, OrchFlow, simulacion-urbana.
+- Conversation in neutral Spanish; documents stay in English to match existing files
 
 ## What to avoid
-- Placeholders left in shipped files (the templates carry them; real docs must not)
+- Aspirational or vague claims about how I work
 - Drift between `templates/CLAUDE_GLOBAL.md` and the installed `~/.claude/CLAUDE.md`
 - Duplicating files across directories (one canonical location per document)
