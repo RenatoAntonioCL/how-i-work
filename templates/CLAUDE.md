@@ -24,6 +24,7 @@ Renato Antonio — https://github.com/RenatoAntonioCL/how-i-work
 - Commit format: type(scope): description (Conventional Commits)
 - Branch format: feat/description, fix/description, docs/description
 - PR template: .github/pull_request_template.md
+- Commits NEVER include `Co-Authored-By` lines (no Claude/AI co-author) — ever
 
 ## Current focus
 [What is being built right now]
