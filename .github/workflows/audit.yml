@@ -43,7 +43,7 @@ jobs:
       - name: Check commit format
         id: commits
         run: |
-          pattern='^(feat|fix|docs|chore|refactor|test|ci)(\([^)]+\))?: .+'
+          pattern='^(feat|fix|docs|chore|refactor|test|ci|release)(\([^)]+\))?: .+'
           invalid=()
           while IFS= read -r subject; do
             [[ -z "$subject" ]] && continue
@@ -105,7 +105,7 @@ jobs:
                 [[ -n "$line" ]] && echo "  - \`${line}\`"
               done < /tmp/invalid_commits.txt
               echo ""
-              echo "_Valid types: \`feat\` · \`fix\` · \`docs\` · \`chore\` · \`refactor\` · \`test\` · \`ci\`. See [GIT.md](https://github.com/RenatoAntonioCL/how-i-work/blob/main/conventions/GIT.md)._"
+              echo "_Valid types: \`feat\` · \`fix\` · \`docs\` · \`chore\` · \`refactor\` · \`test\` · \`ci\` · \`release\`. See [GIT.md](https://github.com/RenatoAntonioCL/how-i-work/blob/main/conventions/GIT.md)._"
             fi
             echo ""
 
