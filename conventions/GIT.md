@@ -26,7 +26,7 @@ type(scope): short description
 Optional body explaining why, not what.
 ```
 
-**Types:** `feat` · `fix` · `docs` · `chore` · `refactor` · `test` · `ci`
+**Types:** `feat` · `fix` · `docs` · `chore` · `refactor` · `test` · `ci` · `release`
 
 **Examples:**
 ```
