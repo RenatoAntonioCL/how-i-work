@@ -1,5 +1,7 @@
 # Context
 
+HOW_I_WORK_VERSION: 0.3.0
+
 ## Current state
 
 What is working right now.
