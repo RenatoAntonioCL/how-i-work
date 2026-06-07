@@ -1,0 +1,165 @@
+name: Update Propagator
+
+# On push to main, propagates changed standards to target repos and opens a PR in each.
+# Requires a fine-grained PAT (contents: write, pull-requests: write) stored as GH_PAT.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'templates/**'
+      - 'conventions/**'
+      - '.github/workflows/audit.yml'
+      - 'VERSION'
+
+jobs:
+  propagate:
+    name: Propagate to ${{ matrix.repo }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        repo: [GenPy, OrchFlow, simulacion-urbana, qrfila]
+      fail-fast: false
+
+    steps:
+      - name: Checkout how-i-work
+        uses: actions/checkout@v4
+        with:
+          path: source
+          fetch-depth: 2
+
+      - name: Detect changed areas
+        id: changes
+        run: |
+          cd source
+          changed=$(git diff --name-only HEAD~1 HEAD 2>/dev/null \
+            || git show --name-only --format='' HEAD)
+          echo "Changed files:"
+          echo "$changed"
+
+          grep -qE '^\.github/workflows/audit\.yml$' <<< "$changed" \
+            && echo "audit=true" >> "$GITHUB_OUTPUT" \
+            || echo "audit=false" >> "$GITHUB_OUTPUT"
+
+          grep -qE '^templates/PULL_REQUEST\.md$' <<< "$changed" \
+            && echo "pr_template=true" >> "$GITHUB_OUTPUT" \
+            || echo "pr_template=false" >> "$GITHUB_OUTPUT"
+
+          grep -qE '^conventions/' <<< "$changed" \
+            && echo "conventions=true" >> "$GITHUB_OUTPUT" \
+            || echo "conventions=false" >> "$GITHUB_OUTPUT"
+
+          grep -qE '^VERSION$' <<< "$changed" \
+            && echo "version=true" >> "$GITHUB_OUTPUT" \
+            || echo "version=false" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout target repo
+        uses: actions/checkout@v4
+        with:
+          repository: RenatoAntonioCL/${{ matrix.repo }}
+          token: ${{ secrets.GH_PAT }}
+          path: target
+          fetch-depth: 1
+
+      - name: Configure git
+        run: |
+          git -C target config user.name "github-actions[bot]"
+          git -C target config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Apply changes and open PR
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+          AUDIT_CHANGED: ${{ steps.changes.outputs.audit }}
+          PR_TEMPLATE_CHANGED: ${{ steps.changes.outputs.pr_template }}
+          CONVENTIONS_CHANGED: ${{ steps.changes.outputs.conventions }}
+          VERSION_CHANGED: ${{ steps.changes.outputs.version }}
+          SOURCE_COMMIT: ${{ github.sha }}
+          TARGET_REPO: ${{ matrix.repo }}
+        run: |
+          branch="chore/sync-how-i-work-${{ github.run_id }}"
+          git -C target checkout -b "$branch"
+
+          changes=()
+          HOW_I_WORK_VERSION=$(cat source/VERSION)
+
+          # Propagate audit workflow when audit.yml or conventions/ changed
+          if [[ "$AUDIT_CHANGED" == "true" || "$CONVENTIONS_CHANGED" == "true" ]]; then
+            mkdir -p target/.github/workflows
+            cp source/.github/workflows/audit.yml target/.github/workflows/audit.yml
+            changes+=("Updated \`.github/workflows/audit.yml\` (compliance checker)")
+          fi
+
+          # Propagate PR template when templates/PULL_REQUEST.md changed
+          if [[ "$PR_TEMPLATE_CHANGED" == "true" ]]; then
+            mkdir -p target/.github
+            cp source/templates/PULL_REQUEST.md target/.github/pull_request_template.md
+            changes+=("Updated \`.github/pull_request_template.md\`")
+          fi
+
+          # Update HOW_I_WORK_VERSION in CONTEXT.md
+          if [[ -f target/CONTEXT.md ]]; then
+            if grep -q "^HOW_I_WORK_VERSION:" target/CONTEXT.md; then
+              sed -i "s/^HOW_I_WORK_VERSION: .*/HOW_I_WORK_VERSION: ${HOW_I_WORK_VERSION}/" target/CONTEXT.md
+            else
+              awk -v ver="$HOW_I_WORK_VERSION" \
+                '/^# Context/{print; print "HOW_I_WORK_VERSION: " ver; next} 1' \
+                target/CONTEXT.md > /tmp/ctx.md && mv /tmp/ctx.md target/CONTEXT.md
+            fi
+            changes+=("Set \`HOW_I_WORK_VERSION\` to \`${HOW_I_WORK_VERSION}\` in \`CONTEXT.md\`")
+          fi
+
+          # Always update sync marker — ensures a genuine diff on every propagation
+          mkdir -p target/.github
+          cat > target/.github/how-i-work-sync.json << EOF
+          {
+            "source_repo": "RenatoAntonioCL/how-i-work",
+            "source_version": "${HOW_I_WORK_VERSION}",
+            "source_commit": "${SOURCE_COMMIT}",
+            "synced_at": "$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+          }
+          EOF
+          changes+=("Updated \`.github/how-i-work-sync.json\`")
+
+          git -C target add .
+          if git -C target diff --cached --quiet; then
+            echo "Nothing to commit for $TARGET_REPO — skipping PR."
+            exit 0
+          fi
+
+          git -C target commit -m "chore: sync how-i-work standards v${HOW_I_WORK_VERSION}"
+          git -C target push origin "$branch"
+
+          # Build PR body
+          {
+            echo "## What does this PR do?"
+            echo ""
+            echo "Automated propagation of updated standards from [how-i-work](https://github.com/RenatoAntonioCL/how-i-work)."
+            echo ""
+            echo "**Changes included:**"
+            for item in "${changes[@]}"; do
+              echo "- ${item}"
+            done
+            echo ""
+            echo "**Source commit:** RenatoAntonioCL/how-i-work@${SOURCE_COMMIT}"
+            echo ""
+            echo "## Type of change"
+            echo ""
+            echo "- [x] chore — maintenance, deps, config"
+            echo ""
+            echo "## Checklist"
+            echo ""
+            echo "- [x] CI is green"
+            echo "- [x] No secrets or credentials committed"
+            echo "- [ ] Review propagated changes for project-specific adjustments"
+          } > /tmp/pr_body.md
+
+          gh pr create \
+            --repo "RenatoAntonioCL/${TARGET_REPO}" \
+            --base main \
+            --head "$branch" \
+            --title "chore: sync how-i-work standards v${HOW_I_WORK_VERSION}" \
+            --body-file /tmp/pr_body.md
+
+          echo "PR opened in RenatoAntonioCL/${TARGET_REPO} from branch ${branch}."
