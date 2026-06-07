@@ -20,7 +20,7 @@ jobs:
       contents: read
     strategy:
       matrix:
-        repo: [GenPy, OrchFlow, simulacion-urbana, qrfila]
+        repo: [GenPy, OrchFlow, society-sim, qrfila]
       fail-fast: false
 
     steps:
