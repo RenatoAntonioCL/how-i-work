@@ -59,3 +59,13 @@ This is an architectural concern, not a prompting trick. Raw context accumulatio
 ## 13. Humans stay in the loop
 
 Agents and orchestrators should never have full authority. There must always be a human checkpoint on key decisions — budget, irreversible actions, calling new external tools. We minimize human intervention but never eliminate it.
+
+## 14. Design patterns are a shared vocabulary
+
+Design patterns are not optional or decorative — they are the common language that makes code readable for every dev on the team. I apply three layers of patterns in my projects:
+
+- **Hexagonal Architecture (Ports & Adapters)** — the domain does not know the infrastructure. Business logic lives in the core; everything external (DB, APIs, UI) connects through ports.
+- **Domain-Driven Design (DDD)** — code speaks the language of the business. Entities, aggregates, value objects, and repositories reflect the real domain, not the database structure.
+- **SOLID** — each class has one responsibility, code depends on abstractions, and modules are extensible without being modifiable.
+
+These three patterns are applied together. They are not independent.
