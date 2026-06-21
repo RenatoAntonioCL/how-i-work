@@ -22,6 +22,7 @@ It exists for three reasons:
 - [`conventions/GIT.md`](./conventions/GIT.md) — branching, PRs, commit format
 - [`conventions/DOCS.md`](./conventions/DOCS.md) — required files in every repo
 - [`conventions/CI_CD.md`](./conventions/CI_CD.md) — pipeline standards and gates
+- [`conventions/ARCHITECTURE_PATTERNS.md`](./conventions/ARCHITECTURE_PATTERNS.md) — Hexagonal, DDD, SOLID application guide
 
 ### Templates
 - [`templates/CLAUDE.md`](./templates/CLAUDE.md) — base context for Claude Code (per project)
@@ -30,6 +31,7 @@ It exists for three reasons:
 - [`templates/ARCHITECTURE.md`](./templates/ARCHITECTURE.md) — architecture doc template
 - [`templates/ADR.md`](./templates/ADR.md) — architecture decision record template
 - [`templates/POSTMORTEM.md`](./templates/POSTMORTEM.md) — post-mortem template
+- [`templates/MASTER_PLAN.md`](./templates/MASTER_PLAN.md) — project seed document (created before code)
 - [`templates/PULL_REQUEST.md`](./templates/PULL_REQUEST.md) — PR template
 
 ### Ecosystem
@@ -38,6 +40,8 @@ It exists for three reasons:
 | [GenPy](https://github.com/RenatoAntonioCL/genpy) | Core runtime — Docker project generator (Bash) | `v1.0.0-alpha` |
 | [OrchFlow](https://github.com/RenatoAntonioCL/orchflow) | Agent engine — autonomous dev agency (TypeScript) | `Phase 0` |
 | [simulacion-urbana](https://github.com/RenatoAntonioCL/simulacion-urbana) | Product layer — persistent urban simulation (Python) | `v0.0.1` |
+| Happybiz (private) | Product layer — queue/check-in system (Python/FastAPI) | `Phase 0` |
+| [Nerdes](https://github.com/RenatoAntonioCL/nerdes) | Community — builders landing page (HTML/CSS) | `Live` |
 
 ### Research
 - [`research/softserve-agentic-day-2026.md`](./research/softserve-agentic-day-2026.md) — SoftServe R&D Agentic Day, Santiago
