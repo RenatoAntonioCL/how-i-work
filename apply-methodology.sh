@@ -49,7 +49,18 @@ else
   echo "  ⏭  Already exists"
 fi
 
-# ── 3. Required docs ────────────────────────────────────────────
+# ── 3. MASTER_PLAN.md ────────────────────────────────────────────
+echo "→ MASTER_PLAN.md..."
+if [[ ! -f "MASTER_PLAN.md" ]]; then
+  cp "$HOW_I_WORK/templates/MASTER_PLAN.md" "MASTER_PLAN.md"
+  sed -i '' "s/\[Project name\]/$REPO/" MASTER_PLAN.md 2>/dev/null || \
+  sed -i "s/\[Project name\]/$REPO/" MASTER_PLAN.md
+  echo "  ✅ Created MASTER_PLAN.md (fill in the details)"
+else
+  echo "  ⏭  Already exists"
+fi
+
+# ── 4. Required docs ────────────────────────────────────────────
 echo "→ Required documentation..."
 for FILE in CONTEXT.md ARCHITECTURE.md CHANGELOG.md; do
   if [[ ! -f "$FILE" ]]; then
@@ -73,7 +84,7 @@ EOF
   fi
 done
 
-# ── 4. ADR directory ────────────────────────────────────────────
+# ── 5. ADR directory ────────────────────────────────────────────
 echo "→ ADR directory..."
 if [[ ! -d "docs/adr" ]]; then
   mkdir -p docs/adr
@@ -82,7 +93,7 @@ else
   echo "  ⏭  Already exists"
 fi
 
-# ── 5. .gitignore base entries ──────────────────────────────────
+# ── 6. .gitignore base entries ──────────────────────────────────
 echo "→ .gitignore..."
 GITIGNORE_ENTRIES=".DS_Store\n*.env\n*.env.local\nnode_modules/\n__pycache__/\n*.pyc"
 if [[ ! -f ".gitignore" ]]; then
@@ -98,7 +109,7 @@ else
   echo "  ✅ Updated .gitignore"
 fi
 
-# ── 6. Commit changes ───────────────────────────────────────────
+# ── 7. Commit changes ───────────────────────────────────────────
 echo "→ Committing..."
 git add .
 if git diff --cached --quiet; then
@@ -108,7 +119,7 @@ else
   echo "  ✅ Committed"
 fi
 
-# ── 7. Branch protection via GitHub API ─────────────────────────
+# ── 8. Branch protection via GitHub API ─────────────────────────
 echo "→ Branch protection on main..."
 gh api \
   --method PUT \
